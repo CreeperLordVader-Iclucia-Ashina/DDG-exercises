@@ -1,0 +1,14 @@
+{
+	"backtraceGraph" : 
+	{
+		"commands" : [],
+		"files" : [],
+		"nodes" : []
+	},
+	"installers" : [],
+	"paths" : 
+	{
+		"build" : "deps/polyscope/deps/glad/src",
+		"source" : "/home/creeper/ddg-exercises/deps/polyscope/deps/glad/src"
+	}
+}

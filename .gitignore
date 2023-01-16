@@ -1,5 +1,7 @@
 **/build/
-
+./projects/simplicial-complex-operators/build/
+./projects/simplicial-complex-operators/cmake-build-debug/
+.idea
 # Prerequisites
 *.d
 
