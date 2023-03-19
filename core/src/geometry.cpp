@@ -54,7 +54,7 @@ double VertexPositionGeometry::meanEdgeLength() const {
     for (Edge e : mesh.edges()) {
         total += edgeLength(e);
     }
-    return total / mesh.nEdges();
+    return total / static_cast<double>(mesh.nEdges());
 }
 
 /*
@@ -80,8 +80,14 @@ double VertexPositionGeometry::totalArea() const {
  */
 double VertexPositionGeometry::cotan(Halfedge he) const {
 
-    // TODO
-    return 0; // placeholder
+    Halfedge nhe = he.next();
+    Halfedge nnhe = nhe.next();
+    assert(nnhe.tipVertex() == he.tailVertex());
+    double c = 0.5 * (halfedgeVector(nhe).norm2() + halfedgeVector(nnhe).norm2() - halfedgeVector(he).norm2())
+                / (halfedgeVector(nnhe).norm() * halfedgeVector(nhe).norm());
+    assert(abs(c) <= 1.0);
+    double s = std::sqrt(1.0 - c * c);
+    return c / s; // placeholder
 }
 
 /*
@@ -92,8 +98,11 @@ double VertexPositionGeometry::cotan(Halfedge he) const {
  */
 double VertexPositionGeometry::barycentricDualArea(Vertex v) const {
 
-    // TODO
-    return 0; // placeholder
+    auto adj = v.adjacentFaces();
+    double sum = 0.0;
+    for(Face f : adj)
+        sum += faceArea(f);
+    return sum / 3.0; // placeholder
 }
 
 /*

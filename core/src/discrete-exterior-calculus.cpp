@@ -40,10 +40,18 @@ namespace surface {
  * Input:
  * Returns: A sparse diagonal matrix representing the Hodge operator that can be applied to discrete 0-forms.
  */
-SparseMatrix<double> VertexPositionGeometry::buildHodgeStar0Form() const {
-
-    // TODO
-    return identityMatrix<double>(1); // placeholder
+SparseMatrix<double> VertexPositionGeometry::buildHodgeStar0Form() const
+{
+    Eigen::SparseMatrix<double> spm;
+    std::vector<Eigen::Triplet<double>>tList;
+    spm.resize(mesh.nVertices(), mesh.nVertices());
+    for(Vertex v : mesh.vertices())
+    {
+        size_t idx = vertexIndices[v];
+        tList.emplace_back(idx, idx, barycentricDualArea(v));
+    }
+    spm.setFromTriplets(tList.begin(), tList.end());
+    return spm; // placeholder
 }
 
 /*
@@ -52,10 +60,19 @@ SparseMatrix<double> VertexPositionGeometry::buildHodgeStar0Form() const {
  * Input:
  * Returns: A sparse diagonal matrix representing the Hodge operator that can be applied to discrete 1-forms.
  */
-SparseMatrix<double> VertexPositionGeometry::buildHodgeStar1Form() const {
-
-    // TODO
-    return identityMatrix<double>(1); // placeholder
+SparseMatrix<double> VertexPositionGeometry::buildHodgeStar1Form() const
+{
+    Eigen::SparseMatrix<double> spm;
+    std::vector<Eigen::Triplet<double>> tList;
+    spm.resize(mesh.nEdges(), mesh.nEdges());
+    for(Edge e : mesh.edges())
+    {
+        size_t idx = edgeIndices[e];
+        Halfedge he = e.halfedge();
+        tList.emplace_back(idx, idx, 0.5 * (cotan(he) + cotan(he.sibling())));
+    }
+    spm.setFromTriplets(tList.begin(), tList.end());
+    return spm; // placeholder
 }
 
 /*
@@ -66,8 +83,16 @@ SparseMatrix<double> VertexPositionGeometry::buildHodgeStar1Form() const {
  */
 SparseMatrix<double> VertexPositionGeometry::buildHodgeStar2Form() const {
 
-    // TODO
-    return identityMatrix<double>(1); // placeholder
+    Eigen::SparseMatrix<double> spm;
+    std::vector<Eigen::Triplet<double>> tList;
+    spm.resize(mesh.nFaces(), mesh.nFaces());
+    for(Face f : mesh.faces())
+    {
+        size_t idx = faceIndices[f];
+        tList.emplace_back(idx, idx, 1.0 / faceArea(f));
+    }
+    spm.setFromTriplets(tList.begin(), tList.end());
+    return spm; // placeholder
 }
 
 /*
@@ -77,9 +102,19 @@ SparseMatrix<double> VertexPositionGeometry::buildHodgeStar2Form() const {
  * Returns: A sparse matrix representing the exterior derivative that can be applied to discrete 0-forms.
  */
 SparseMatrix<double> VertexPositionGeometry::buildExteriorDerivative0Form() const {
-
-    // TODO
-    return identityMatrix<double>(1); // placeholder
+    Eigen::SparseMatrix<double> spm;
+    std::vector<Eigen::Triplet<double> >tList;
+    spm.resize(mesh.nEdges(), mesh.nVertices());
+    for(Edge e : mesh.edges())
+    {
+        size_t a = vertexIndices[e.firstVertex()];
+        size_t b = vertexIndices[e.secondVertex()];
+        uint idx = edgeIndices[e];
+        tList.emplace_back(idx, a, -1.0);
+        tList.emplace_back(idx, b, 1.0);
+    }
+    spm.setFromTriplets(tList.begin(), tList.end());
+    return spm; // placeholder
 }
 
 /*
@@ -89,9 +124,21 @@ SparseMatrix<double> VertexPositionGeometry::buildExteriorDerivative0Form() cons
  * Returns: A sparse matrix representing the exterior derivative that can be applied to discrete 1-forms.
  */
 SparseMatrix<double> VertexPositionGeometry::buildExteriorDerivative1Form() const {
-
-    // TODO
-    return identityMatrix<double>(1); // placeholder
+    Eigen::SparseMatrix<double> spm;
+    spm.resize(mesh.nFaces(), mesh.nEdges());
+    std::vector<Eigen::Triplet<double>> tList;
+    for(Edge e : mesh.edges())
+    {
+        size_t idx = edgeIndices[e];
+        Face fA = e.halfedge().face();
+        Face fB = e.halfedge().sibling().face();
+        size_t idxA = faceIndices[fA];
+        size_t idxB = faceIndices[fB];
+        tList.emplace_back(idxA, idx, 1.0);
+        tList.emplace_back(idxB, idx, -1.0);
+    }
+    spm.setFromTriplets(tList.begin(), tList.end());
+    return spm; // placeholder
 }
 
 } // namespace surface
