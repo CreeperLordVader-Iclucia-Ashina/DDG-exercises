@@ -834,6 +834,9 @@ int main(int argc, char** argv) {
     psMesh_dual->setEnabled(false);
 
     // Build DEC operators.
+    geometry->requireVertexIndices();
+    geometry->requireEdgeIndices();
+    geometry->requireFaceIndices();
     D0 = geometry->buildExteriorDerivative0Form();
     D1 = geometry->buildExteriorDerivative1Form();
     D0T = D0.transpose();

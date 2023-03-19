@@ -123,7 +123,9 @@ class DiscreteExteriorCalculusTest : public ::testing::Test {
             fMat(i, 2) = f[i][2] - 1;
         }
         std::tie(this->mesh, this->geometry) = makeManifoldSurfaceMeshAndGeometry(vMat, fMat);
-
+        geometry->requireFaceIndices();
+        geometry->requireEdgeIndices();
+        geometry->requireVertexIndices();
         this->D0 = geometry->buildExteriorDerivative0Form();
         this->D1 = geometry->buildExteriorDerivative1Form();
         this->H0 = geometry->buildHodgeStar0Form();
